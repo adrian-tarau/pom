@@ -21,7 +21,4 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
-/target/maven-shared-archive-resources/META-INF/DEPENDENCIES
-/target/maven-shared-archive-resources/META-INF/LICENSE
-/target/maven-shared-archive-resources/META-INF/NOTICE
-/target/.plxarc
+/target/
