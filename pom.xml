@@ -25,7 +25,7 @@
 
     <groupId>net.microfalx</groupId>
     <artifactId>pom</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <packaging>pom</packaging>
 
     <parent>
@@ -136,6 +136,12 @@
                     <version>3.4.0</version>
                 </plugin>
 
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>versions-maven-plugin</artifactId>
+                    <version>2.17.1</version>
+                </plugin>
+
             </plugins>
         </pluginManagement>
         <plugins>
@@ -219,6 +225,37 @@
                 <configuration>
                     <failOnError>false</failOnError>
                     <onlyAnalyze>net.microfalx.-</onlyAnalyze>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <configuration>
+                    <ruleSet>
+                        <ignoreVersions>
+                            <ignoreVersion>
+                                <type>regex</type>
+                                <version>(?i).*beta.*</version>
+                            </ignoreVersion>
+                            <ignoreVersion>
+                                <type>regex</type>
+                                <version>(?i).*alpha.*</version>
+                            </ignoreVersion>
+                            <ignoreVersion>
+                                <type>regex</type>
+                                <version>(?i).*rc\d+</version>
+                            </ignoreVersion>
+                            <ignoreVersion>
+                                <type>regex</type>
+                                <version>(?i).*m\d+</version>
+                            </ignoreVersion>
+                            <ignoreVersion>
+                                <type>regex</type>
+                                <version>(?i)20{6,8}.*</version>
+                            </ignoreVersion>
+                        </ignoreVersions>
+                    </ruleSet>
                 </configuration>
             </plugin>
 
