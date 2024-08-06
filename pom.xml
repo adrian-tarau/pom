@@ -244,7 +244,19 @@
                             </ignoreVersion>
                             <ignoreVersion>
                                 <type>regex</type>
-                                <version>(?i).*rc\d+</version>
+                                <version>(?i).*(ce|ccs)</version>
+                            </ignoreVersion>
+                            <ignoreVersion>
+                                <type>regex</type>
+                                <version>(?i).*rc\d*</version>
+                            </ignoreVersion>
+                            <ignoreVersion>
+                                <type>regex</type>
+                                <version>(?i).*cr\d*</version>
+                            </ignoreVersion>
+                            <ignoreVersion>
+                                <type>regex</type>
+                                <version>(?i).*dev\d*</version>
                             </ignoreVersion>
                             <ignoreVersion>
                                 <type>regex</type>
@@ -252,7 +264,7 @@
                             </ignoreVersion>
                             <ignoreVersion>
                                 <type>regex</type>
-                                <version>(?i)20{6,8}.*</version>
+                                <version>(?i)20\d{6,12}.*</version>
                             </ignoreVersion>
                         </ignoreVersions>
                     </ruleSet>
