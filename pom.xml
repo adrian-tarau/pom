@@ -25,7 +25,7 @@
 
     <groupId>net.microfalx</groupId>
     <artifactId>pom</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <packaging>pom</packaging>
 
     <parent>
@@ -64,6 +64,10 @@
         <jacoco.reports>${project.reporting.outputDirectory}/jacoco</jacoco.reports>
     </properties>
 
+    <prerequisites>
+        <maven>3.6.3</maven>
+    </prerequisites>
+
     <developers>
         <developer>
             <name>Adrian Tarau</name>
@@ -95,25 +99,25 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>3.4.2</version>
+                    <version>3.8.0</version>
                 </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <version>3.1.1</version>
                 </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.12.1</version>
+                    <version>3.21.0</version>
                 </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.2.3</version>
+                    <version>3.5.2</version>
                 </plugin>
 
                 <!-- Others -->
@@ -127,19 +131,19 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.7.3.3</version>
+                    <version>4.8.6.6</version>
                 </plugin>
 
                 <plugin>
                     <groupId>com.google.cloud.tools</groupId>
                     <artifactId>jib-maven-plugin</artifactId>
-                    <version>3.4.0</version>
+                    <version>3.4.4</version>
                 </plugin>
 
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.17.1</version>
+                    <version>2.18.0</version>
                 </plugin>
 
                 <plugin>
@@ -164,6 +168,12 @@
                     <groupId>org.apache.maven.scm</groupId>
                     <artifactId>maven-scm-provider-svnexe</artifactId>
                     <version>2.1.0</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>3.5.0</version>
                 </plugin>
 
             </plugins>
@@ -250,6 +260,29 @@
                     <failOnError>false</failOnError>
                     <onlyAnalyze>net.microfalx.-</onlyAnalyze>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-versions</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>[3.8, 4.0)</version>
+                                </requireMavenVersion>
+                                <requireJavaVersion>
+                                    <version>[21, 23)</version>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
