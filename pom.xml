@@ -25,7 +25,7 @@
 
     <groupId>net.microfalx</groupId>
     <artifactId>pom</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
     <packaging>pom</packaging>
 
     <parent>
@@ -57,11 +57,31 @@
     <inceptionYear>2024</inceptionYear>
 
     <properties>
-        <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <java.version>21</java.version>
+        <java.compiler.opts/>
+        <java.module.opts/>
+        <java.runtime.opts>${java.module.opts}</java.runtime.opts>
+        <java.doc.opts>-Xdoclint:none</java.doc.opts>
+
+        <skip.unit.tests>false</skip.unit.tests>
+        <skip.integration.tests>false</skip.integration.tests>
+
         <jacoco.file>jacoco.exec</jacoco.file>
         <jacoco.ut.dest>${project.build.directory}/${jacoco.file}</jacoco.ut.dest>
         <jacoco.reports>${project.reporting.outputDirectory}/jacoco</jacoco.reports>
+
+        <surefire.jvm.common.args>-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp</surefire.jvm.common.args>
+        <surefire.jvm.args>-Xmx640m ${surefire.jvm.common.args}</surefire.jvm.args>
+
+        <surefire.forkCount>1</surefire.forkCount>
+        <surefire.reuseForks>true</surefire.reuseForks>
+        <failsafe.forkCount>1</failsafe.forkCount>
+        <failsafe.reuseForks>false</failsafe.reuseForks>
+
+        <serenity.version>4.2.17</serenity.version>
+        <serenity.tags/>
     </properties>
 
     <prerequisites>
@@ -89,6 +109,134 @@
 
     <dependencies>
     </dependencies>
+
+    <profiles>
+
+        <profile>
+            <id>dev</id>
+            <properties>
+                <skip.integration.tests>true</skip.integration.tests>
+                <skip.unit.tests>true</skip.unit.tests>
+            </properties>
+            <activation>
+                <property>
+                    <name>!microfalx.non_development</name>
+                </property>
+            </activation>
+        </profile>
+
+        <profile>
+            <id>unit-test</id>
+            <properties>
+                <skip.integration.tests>true</skip.integration.tests>
+                <skip.unit.tests>false</skip.unit.tests>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>integration-test</id>
+            <properties>
+                <skip.integration.tests>false</skip.integration.tests>
+                <skip.surefire.tests>false</skip.surefire.tests>
+                <skip.unit.tests>true</skip.unit.tests>
+                <failsafe.include.pattern>**/*IntegrationTest.java</failsafe.include.pattern>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>system-test</id>
+            <properties>
+                <skip.integration.tests>false</skip.integration.tests>
+                <skip.unit.tests>true</skip.unit.tests>
+                <maven.test.skip>false</maven.test.skip>
+                <failsafe.include.pattern>**/*SystemTest.java</failsafe.include.pattern>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>dist</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <quiet>true</quiet>
+                            <encoding>UTF-8</encoding>
+                            <docencoding>UTF-8</docencoding>
+                            <notimestamp>true</notimestamp>
+                            <doclint>none</doclint>
+                            <offline>true</offline>
+                            <show>public</show>
+                            <validateLinks>false</validateLinks>
+                            <archive>
+                                <manifest>
+                                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                    <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>module-javadocs</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!--plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin-->
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>sign</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <configuration>
+                                    <keyname>${gpg.keyname}</keyname>
+                                    <passphraseServerId>${gpg.keyname}</passphraseServerId>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <build>
         <pluginManagement>
@@ -123,6 +271,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.5.2</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
                     <version>3.5.2</version>
                 </plugin>
 
@@ -188,6 +342,37 @@
                     <version>1.7.0</version>
                 </plugin>
 
+                <plugin>
+                    <groupId>net.serenity-bdd.maven.plugins</groupId>
+                    <artifactId>serenity-maven-plugin</artifactId>
+                    <version>${serenity.version}</version>
+                    <configuration>
+                        <tags>${serenity.tags}</tags>
+                        <reports>single-page-html,navigator</reports>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>serenity-reports</id>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>aggregate</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>net.serenity-bdd</groupId>
+                            <artifactId>serenity-single-page-report</artifactId>
+                            <version>${serenity.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>net.serenity-bdd</groupId>
+                            <artifactId>serenity-navigator-report</artifactId>
+                            <version>${serenity.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+
             </plugins>
         </pluginManagement>
         <plugins>
@@ -237,10 +422,59 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
+                    <skip>${skip.unit.tests}</skip>
+                    <skipTests>${skip.unit.tests}</skipTests>
+                    <forkCount>${surefire.forkCount}</forkCount>
+                    <reuseForks>${surefire.reuseForks}</reuseForks>
+                    <forkedProcessExitTimeoutInSeconds>60</forkedProcessExitTimeoutInSeconds>
+                    <forkedProcessTimeoutInSeconds>600</forkedProcessTimeoutInSeconds>
                     <testFailureIgnore>true</testFailureIgnore>
                     <runOrder>alphabetical</runOrder>
                     <trimStackTrace>false</trimStackTrace>
+                    <argLine>-Xshare:off ${surefire.jvm.args}</argLine>
+                    <excludes>
+                        <exclude>**/Abstract*TestCase.java</exclude>
+                        <exclude>**/Abstract*Test.java</exclude>
+                        <exclude>**/*PerformanceTest.java</exclude>
+                        <exclude>**/*IntegrationTest.java</exclude>
+                        <exclude>**/*SystemTest.java</exclude>
+                    </excludes>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <forkCount>${failsafe.forkCount}</forkCount>
+                    <reuseForks>${failsafe.reuseForks}</reuseForks>
+                    <threadCountClasses>${failsafe.forkCount}</threadCountClasses>
+                    <forkedProcessExitTimeoutInSeconds>60</forkedProcessExitTimeoutInSeconds>
+                    <forkedProcessTimeoutInSeconds>900</forkedProcessTimeoutInSeconds>
+                    <argLine>${surefire.jvm.args}</argLine>
+
+                    <testFailureIgnore>true</testFailureIgnore>
+                    <skip>${skip.integration.tests}</skip>
+                    <skipTests>${skip.integration.tests}</skipTests>
+                    <runOrder>alphabetical</runOrder>
+                    <trimStackTrace>false</trimStackTrace>
+                    <parallel>classes</parallel>
+                    <excludes>
+                        <exclude>**/Abstract*TestCase.java</exclude>
+                        <exclude>**/Abstract*Test.java</exclude>
+                    </excludes>
+                    <includes>
+                        <include>${failsafe.include.pattern}</include>
+                    </includes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
@@ -372,85 +606,6 @@
             </plugin>
         </plugins>
     </reporting>
-
-    <profiles>
-        <profile>
-            <id>dist</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <configuration>
-                            <quiet>true</quiet>
-                            <encoding>UTF-8</encoding>
-                            <notimestamp>true</notimestamp>
-                            <doclint>none</doclint>
-                            <offline>true</offline>
-                            <show>public</show>
-                            <validateLinks>false</validateLinks>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>module-javadocs</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <!--plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <serverId>ossrh</serverId>
-                            <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                        </configuration>
-                    </plugin-->
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>sign</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                                <configuration>
-                                    <keyname>${gpg.keyname}</keyname>
-                                    <passphraseServerId>${gpg.keyname}</passphraseServerId>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
     <distributionManagement>
         <snapshotRepository>
