@@ -80,6 +80,21 @@
         <failsafe.forkCount>1</failsafe.forkCount>
         <failsafe.reuseForks>false</failsafe.reuseForks>
 
+        <maven-release.version>3.1.1</maven-release.version>
+        <maven-deploy.version>3.1.4</maven-deploy.version>
+        <maven-site.version>3.21.0</maven-site.version>
+        <maven-surefire.version>3.5.3</maven-surefire.version>
+        <maven-failsafe.version>3.5.3</maven-failsafe.version>
+        <maven-enforcer.version>3.6.1</maven-enforcer.version>
+        <maven-compiler.version>3.8.1</maven-compiler.version>
+        <maven-scm.version>2.1.0</maven-scm.version>
+        <maven-project-info.version>3.9.0</maven-project-info.version>
+
+        <jacoco.version>0.8.13</jacoco.version>
+        <spotbugs.version>4.9.3.2</spotbugs.version>
+        <codehaus.versions.version>2.18.0</codehaus.versions.version>
+        <sonatype.nexus.staging.version>1.7.0</sonatype.nexus.staging.version>
+
         <serenity.version>4.2.34</serenity.version>
         <serenity.tags/>
     </properties>
@@ -247,37 +262,37 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>3.9.0</version>
+                    <version>${maven-project-info.version}</version>
                 </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>${maven-release.version}</version>
                 </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>3.1.4</version>
+                    <version>${maven-deploy.version}</version>
                 </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.21.0</version>
+                    <version>${maven-site.version}</version>
                 </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.5.3</version>
+                    <version>${maven-surefire.version}</version>
                 </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.5.3</version>
+                    <version>${maven-failsafe.version}</version>
                 </plugin>
 
                 <!-- Others -->
@@ -285,55 +300,55 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.13</version>
+                    <version>${jacoco.version}</version>
                 </plugin>
 
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.9.3.2</version>
+                    <version>${spotbugs.version}</version>
                 </plugin>
 
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.18.0</version>
+                    <version>${codehaus.versions.version}</version>
                 </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.scm</groupId>
                     <artifactId>maven-scm-api</artifactId>
-                    <version>2.1.0</version>
+                    <version>${maven-scm.version}</version>
                 </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.scm</groupId>
                     <artifactId>maven-scm-provider-gitexe</artifactId>
-                    <version>2.1.0</version>
+                    <version>${maven-scm.version}</version>
                 </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.scm</groupId>
                     <artifactId>maven-scm-provider-svn-commons</artifactId>
-                    <version>2.1.0</version>
+                    <version>${maven-scm.version}</version>
                 </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.scm</groupId>
                     <artifactId>maven-scm-provider-svnexe</artifactId>
-                    <version>2.1.0</version>
+                    <version>${maven-scm.version}</version>
                 </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.6.1</version>
+                    <version>${maven-enforcer.version}</version>
                 </plugin>
 
                 <plugin>
                     <groupId>org.sonatype.plugins</groupId>
                     <artifactId>nexus-staging-maven-plugin</artifactId>
-                    <version>1.7.0</version>
+                    <version>${sonatype.nexus.staging.version}</version>
                 </plugin>
 
                 <plugin>
