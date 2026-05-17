@@ -25,7 +25,7 @@
 
     <groupId>net.microfalx</groupId>
     <artifactId>pom</artifactId>
-    <version>1.0.9</version>
+    <version>1.0.10</version>
     <packaging>pom</packaging>
 
     <parent>
@@ -80,22 +80,22 @@
         <failsafe.forkCount>1</failsafe.forkCount>
         <failsafe.reuseForks>false</failsafe.reuseForks>
 
-        <maven-release.version>3.1.1</maven-release.version>
+        <maven-release.version>3.3.1</maven-release.version>
         <maven-deploy.version>3.1.4</maven-deploy.version>
         <maven-site.version>3.21.0</maven-site.version>
-        <maven-surefire.version>3.5.3</maven-surefire.version>
-        <maven-failsafe.version>3.5.3</maven-failsafe.version>
-        <maven-enforcer.version>3.6.1</maven-enforcer.version>
+        <maven-surefire.version>3.5.5</maven-surefire.version>
+        <maven-failsafe.version>3.5.5</maven-failsafe.version>
+        <maven-enforcer.version>3.6.2</maven-enforcer.version>
         <maven-compiler.version>3.8.1</maven-compiler.version>
-        <maven-scm.version>2.1.0</maven-scm.version>
+        <maven-scm.version>2.2.1</maven-scm.version>
         <maven-project-info.version>3.9.0</maven-project-info.version>
 
-        <jacoco.version>0.8.13</jacoco.version>
-        <spotbugs.version>4.9.3.2</spotbugs.version>
-        <codehaus.versions.version>2.18.0</codehaus.versions.version>
-        <sonatype.central-publishing>0.8.0</sonatype.central-publishing>
+        <jacoco.version>0.8.14</jacoco.version>
+        <spotbugs.version>4.9.8.3</spotbugs.version>
+        <codehaus.versions.version>2.21.0</codehaus.versions.version>
+        <sonatype.central-publishing>0.10.0</sonatype.central-publishing>
 
-        <serenity.version>4.2.34</serenity.version>
+        <serenity.version>5.3.10</serenity.version>
         <serenity.tags/>
     </properties>
 
@@ -112,8 +112,11 @@
 
     <repositories>
         <repository>
-            <id>confluent</id>
-            <url>https://packages.confluent.io/maven/</url>
+            <id>central</id>
+            <url>https://repo.maven.apache.org/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
     </repositories>
 
@@ -599,6 +602,17 @@
                                 <version>(?i)20\d{6,12}.*</version>
                             </ignoreVersion>
                         </ignoreVersions>
+                        <rules>
+                            <rule>
+                                <groupId>net.serenity-bdd</groupId>
+                                <ignoreVersions>
+                                    <ignoreVersion>
+                                        <type>regex</type>
+                                        <version>5.*</version>
+                                    </ignoreVersion>
+                                </ignoreVersions>
+                            </rule>
+                        </rules>
                     </ruleSet>
                 </configuration>
             </plugin>
