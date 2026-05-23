@@ -59,6 +59,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
+
         <java.version>21</java.version>
         <java.compiler.opts/>
         <java.module.opts/>
@@ -85,15 +87,19 @@
         <maven-site.version>3.21.0</maven-site.version>
         <maven-surefire.version>3.5.5</maven-surefire.version>
         <maven-failsafe.version>3.5.5</maven-failsafe.version>
-        <maven-enforcer.version>3.6.2</maven-enforcer.version>
+        <maven-enforcer.version>3.6.3</maven-enforcer.version>
         <maven-compiler.version>3.8.1</maven-compiler.version>
+        <maven-jar.version>3.5.0</maven-jar.version>
         <maven-scm.version>2.2.1</maven-scm.version>
         <maven-project-info.version>3.9.0</maven-project-info.version>
 
         <jacoco.version>0.8.14</jacoco.version>
         <spotbugs.version>4.9.8.3</spotbugs.version>
         <codehaus.versions.version>2.21.0</codehaus.versions.version>
+        <codehause.buildnumber.version>3.3.0</codehause.buildnumber.version>
         <sonatype.central-publishing>0.10.0</sonatype.central-publishing>
+
+        <ci.build.number>${env.BUILD_NUMBER}</ci.build.number>
 
         <serenity.version>5.3.10</serenity.version>
         <serenity.tags/>
@@ -291,6 +297,12 @@
                     <version>${maven-failsafe.version}</version>
                 </plugin>
 
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${maven-jar.version}</version>
+                </plugin>
+
                 <!-- Others -->
 
                 <plugin>
@@ -309,6 +321,12 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
                     <version>${codehaus.versions.version}</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>buildnumber-maven-plugin</artifactId>
+                    <version>${codehause.buildnumber.version}</version>
                 </plugin>
 
                 <plugin>
@@ -394,6 +412,26 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <addMavenDescriptor>true</addMavenDescriptor>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                        <manifestEntries>
+                            <Implementation-Build>${maven.build.number}</Implementation-Build>
+                            <Build-Id>${ci.build.number}</Build-Id>
+                            <Build-Time>${maven.build.timestamp}</Build-Time>
+                        </manifestEntries>
+                        <index>true</index>
+                    </archive>
                 </configuration>
             </plugin>
 
@@ -553,6 +591,25 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <buildNumberPropertyName>maven.build.number</buildNumberPropertyName>
+                    <getRevisionOnlyOnce>true</getRevisionOnlyOnce>
+                    <shortRevisionLength>8</shortRevisionLength>
+                </configuration>
+
             </plugin>
 
             <plugin>
