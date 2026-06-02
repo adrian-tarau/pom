@@ -25,7 +25,7 @@
 
     <groupId>net.microfalx</groupId>
     <artifactId>pom</artifactId>
-    <version>1.0.12</version>
+    <version>1.0.13</version>
     <packaging>pom</packaging>
 
     <parent>
@@ -106,8 +106,7 @@
         <codehaus.versions.version>2.21.0</codehaus.versions.version>
         <codehause.buildnumber.version>3.3.0</codehause.buildnumber.version>
         <sonatype.central-publishing>0.8.0</sonatype.central-publishing>
-
-        <ci.build.number>${env.BUILD_NUMBER}</ci.build.number>
+        <talos.version>1.0.4</talos.version>
 
         <serenity.version>5.3.10</serenity.version>
         <serenity.tags/>
@@ -338,6 +337,12 @@
                 </plugin>
 
                 <plugin>
+                    <groupId>net.microfalx.talos</groupId>
+                    <artifactId>talos-maven-plugin</artifactId>
+                    <version>${talos.version}</version>
+                </plugin>
+
+                <plugin>
                     <groupId>org.apache.maven.scm</groupId>
                     <artifactId>maven-scm-api</artifactId>
                     <version>${maven-scm.version}</version>
@@ -435,7 +440,7 @@
                         </manifest>
                         <manifestEntries>
                             <Implementation-Build>${maven.build.number}</Implementation-Build>
-                            <Build-Id>${ci.build.number}</Build-Id>
+                            <Build-Id>${build.number}</Build-Id>
                             <Build-Time>${maven.build.timestamp}</Build-Time>
                         </manifestEntries>
                         <index>true</index>
@@ -680,6 +685,19 @@
                         </rules>
                     </ruleSet>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>net.microfalx.talos</groupId>
+                <artifactId>talos-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>build-number</id>
+                        <goals>
+                            <goal>build-number</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
         </plugins>
