@@ -25,14 +25,8 @@
 
     <groupId>net.microfalx</groupId>
     <artifactId>pom</artifactId>
-    <version>1.0.14</version>
+    <version>1.0.15</version>
     <packaging>pom</packaging>
-
-    <parent>
-        <groupId>org.apache</groupId>
-        <artifactId>apache</artifactId>
-        <version>23</version>
-    </parent>
 
     <name>Parent POM</name>
     <description>A parent POM for Java projects.</description>
@@ -96,7 +90,10 @@
         <maven-surefire.version>3.5.6</maven-surefire.version>
         <maven-failsafe.version>3.5.6</maven-failsafe.version>
         <maven-enforcer.version>3.6.3</maven-enforcer.version>
-        <maven-compiler.version>3.8.1</maven-compiler.version>
+        <maven-compiler.version>3.15.0</maven-compiler.version>
+        <maven-javadoc.version>3.12.0</maven-javadoc.version>
+        <maven-source.version>3.4.0</maven-source.version>
+        <maven-gpg.version>3.2.8</maven-gpg.version>
         <maven-jar.version>3.5.0</maven-jar.version>
         <maven-scm.version>2.2.1</maven-scm.version>
         <maven-project-info.version>3.9.0</maven-project-info.version>
@@ -192,42 +189,16 @@
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <configuration>
-                            <quiet>true</quiet>
-                            <encoding>UTF-8</encoding>
-                            <docencoding>UTF-8</docencoding>
-                            <notimestamp>true</notimestamp>
-                            <doclint>none</doclint>
-                            <offline>true</offline>
-                            <show>public</show>
-                            <validateLinks>false</validateLinks>
-                            <archive>
-                                <manifest>
-                                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                                    <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                                </manifest>
-                            </archive>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>module-javadocs</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
+                        <artifactId>maven-source-plugin</artifactId>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>attach-sources</id>
                                 <phase>package</phase>
                                 <goals>
-                                    <goal>jar-no-fork</goal>
+                                    <goal>jar</goal>
                                 </goals>
                             </execution>
                         </executions>
@@ -252,10 +223,6 @@
                                 <goals>
                                     <goal>sign</goal>
                                 </goals>
-                                <configuration>
-                                    <keyname>${gpg.keyname}</keyname>
-                                    <passphraseServerId>${gpg.keyname}</passphraseServerId>
-                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
@@ -280,36 +247,109 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
                     <version>${maven-release.version}</version>
+                    <configuration>
+                        <autoVersionSubmodules>true</autoVersionSubmodules>
+                        <useReleaseProfile>false</useReleaseProfile>
+                        <releaseProfiles>dist,sign</releaseProfiles>
+                        <preparationGoals>clean install</preparationGoals>
+                        <arguments>-DskipTests</arguments>
+                        <goals>clean deploy</goals>
+                        <tagNameFormat>@{project.version}</tagNameFormat>
+                        <scmCommentPrefix>Release></scmCommentPrefix>
+                    </configuration>
                 </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>${maven-deploy.version}</version>
+                    <configuration>
+                        <retryFailedDeploymentCount>3</retryFailedDeploymentCount>
+                    </configuration>
                 </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
                     <version>${maven-site.version}</version>
+                    <inherited>false</inherited>
+                    <configuration>
+                        <skip>true</skip>
+                    </configuration>
                 </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven-surefire.version}</version>
+                    <configuration>
+                        <skip>${skip.unit.tests}</skip>
+                        <skipTests>${skip.unit.tests}</skipTests>
+                        <forkCount>${surefire.forkCount}</forkCount>
+                        <reuseForks>${surefire.reuseForks}</reuseForks>
+                        <forkedProcessExitTimeoutInSeconds>60</forkedProcessExitTimeoutInSeconds>
+                        <forkedProcessTimeoutInSeconds>600</forkedProcessTimeoutInSeconds>
+                        <testFailureIgnore>true</testFailureIgnore>
+                        <runOrder>alphabetical</runOrder>
+                        <trimStackTrace>false</trimStackTrace>
+                        <argLine>-Xshare:off ${surefire.jvm.args}</argLine>
+                        <excludes>
+                            <exclude>**/Abstract*TestCase.java</exclude>
+                            <exclude>**/Abstract*Test.java</exclude>
+                            <exclude>**/*PerformanceTest.java</exclude>
+                            <exclude>**/*IntegrationTest.java</exclude>
+                            <exclude>**/*SystemTest.java</exclude>
+                        </excludes>
+                    </configuration>
                 </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>${maven-failsafe.version}</version>
+                    <configuration>
+                        <forkCount>${failsafe.forkCount}</forkCount>
+                        <reuseForks>${failsafe.reuseForks}</reuseForks>
+                        <threadCountClasses>${failsafe.forkCount}</threadCountClasses>
+                        <forkedProcessExitTimeoutInSeconds>60</forkedProcessExitTimeoutInSeconds>
+                        <forkedProcessTimeoutInSeconds>900</forkedProcessTimeoutInSeconds>
+                        <argLine>${surefire.jvm.args}</argLine>
+
+                        <testFailureIgnore>true</testFailureIgnore>
+                        <skip>${skip.integration.tests}</skip>
+                        <skipTests>${skip.integration.tests}</skipTests>
+                        <runOrder>alphabetical</runOrder>
+                        <trimStackTrace>false</trimStackTrace>
+                        <parallel>classes</parallel>
+                        <excludes>
+                            <exclude>**/Abstract*TestCase.java</exclude>
+                            <exclude>**/Abstract*Test.java</exclude>
+                        </excludes>
+                        <includes>
+                            <include>${failsafe.include.pattern}</include>
+                        </includes>
+                    </configuration>
                 </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>${maven-jar.version}</version>
+                    <configuration>
+                        <archive>
+                            <addMavenDescriptor>true</addMavenDescriptor>
+                            <manifest>
+                                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                            </manifest>
+                            <manifestEntries>
+                                <Implementation-Build>${maven.build.number}</Implementation-Build>
+                                <Build-Id>${build.number}</Build-Id>
+                                <Build-Time>${maven.build.timestamp}</Build-Time>
+                            </manifestEntries>
+                            <index>true</index>
+                        </archive>
+                    </configuration>
                 </plugin>
 
                 <!-- Others -->
@@ -318,6 +358,9 @@
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>${jacoco.version}</version>
+                    <configuration>
+                        <formats>XML</formats>
+                    </configuration>
                 </plugin>
 
                 <plugin>
@@ -336,6 +379,11 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>buildnumber-maven-plugin</artifactId>
                     <version>${codehause.buildnumber.version}</version>
+                    <configuration>
+                        <buildNumberPropertyName>maven.build.number</buildNumberPropertyName>
+                        <getRevisionOnlyOnce>true</getRevisionOnlyOnce>
+                        <shortRevisionLength>8</shortRevisionLength>
+                    </configuration>
                 </plugin>
 
                 <plugin>
@@ -372,6 +420,73 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
                     <version>${maven-enforcer.version}</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler.version}</version>
+                    <configuration>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
+                        <showWarnings>false</showWarnings>
+                        <showDeprecation>false</showDeprecation>
+                        <compilerArgs>
+                            <arg>-Xlint:none</arg>
+                        </compilerArgs>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>${maven-source.version}</version>
+                    <executions>
+                        <execution>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>jar-no-fork</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>${maven-javadoc.version}</version>
+                    <configuration>
+                        <quiet>true</quiet>
+                        <encoding>UTF-8</encoding>
+                        <docencoding>UTF-8</docencoding>
+                        <notimestamp>true</notimestamp>
+                        <serialwarn>false</serialwarn>
+                        <doclint>none</doclint>
+                        <show>public</show>
+                        <detectLinks>false</detectLinks>
+                        <validateLinks>false</validateLinks>
+                        <archive>
+                            <manifest>
+                                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                            </manifest>
+                        </archive>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>${maven-gpg.version}</version>
+                    <configuration>
+                        <bestPractices>true</bestPractices>
+                        <keyEnvName>MAVEN_GPG_KEY</keyEnvName>
+                        <keyFilePath>${env.MAVEN_GPG_KEY_FILE}</keyFilePath>
+                        <passphraseEnvName>MAVEN_GPG_PASSPHRASE</passphraseEnvName>
+                        <gpgArguments>
+                            <arg>--digest-algo=SHA512</arg>
+                        </gpgArguments>
+                    </configuration>
                 </plugin>
 
                 <plugin>
@@ -420,6 +535,13 @@
 
                 <plugin>
                     <groupId>org.jreleaser</groupId>
+                    <artifactId>jreleaser-maven-plugin</artifactId>
+                    <version>${jreleaser.version}</version>
+                    <inherited>false</inherited>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.jreleaser</groupId>
                     <artifactId>jdks-maven-plugin</artifactId>
                     <version>${jreleaser.version}</version>
                     <inherited>false</inherited>
@@ -431,30 +553,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                </configuration>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <addMavenDescriptor>true</addMavenDescriptor>
-                        <manifest>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                        </manifest>
-                        <manifestEntries>
-                            <Implementation-Build>${maven.build.number}</Implementation-Build>
-                            <Build-Id>${build.number}</Build-Id>
-                            <Build-Time>${maven.build.timestamp}</Build-Time>
-                        </manifestEntries>
-                        <index>true</index>
-                    </archive>
-                </configuration>
             </plugin>
 
             <plugin>
@@ -470,75 +573,21 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <configuration>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
-                    <useReleaseProfile>false</useReleaseProfile>
-                    <releaseProfiles>dist,sign</releaseProfiles>
-                    <preparationGoals>clean install</preparationGoals>
-                    <arguments>-DskipTests</arguments>
-                    <goals>clean deploy</goals>
-                    <tagNameFormat>@{project.version}</tagNameFormat>
-                    <scmCommentPrefix>Release></scmCommentPrefix>
-                </configuration>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <retryFailedDeploymentCount>3</retryFailedDeploymentCount>
-                </configuration>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <skip>${skip.unit.tests}</skip>
-                    <skipTests>${skip.unit.tests}</skipTests>
-                    <forkCount>${surefire.forkCount}</forkCount>
-                    <reuseForks>${surefire.reuseForks}</reuseForks>
-                    <forkedProcessExitTimeoutInSeconds>60</forkedProcessExitTimeoutInSeconds>
-                    <forkedProcessTimeoutInSeconds>600</forkedProcessTimeoutInSeconds>
-                    <testFailureIgnore>true</testFailureIgnore>
-                    <runOrder>alphabetical</runOrder>
-                    <trimStackTrace>false</trimStackTrace>
-                    <argLine>-Xshare:off ${surefire.jvm.args}</argLine>
-                    <excludes>
-                        <exclude>**/Abstract*TestCase.java</exclude>
-                        <exclude>**/Abstract*Test.java</exclude>
-                        <exclude>**/*PerformanceTest.java</exclude>
-                        <exclude>**/*IntegrationTest.java</exclude>
-                        <exclude>**/*SystemTest.java</exclude>
-                    </excludes>
-                </configuration>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <configuration>
-                    <forkCount>${failsafe.forkCount}</forkCount>
-                    <reuseForks>${failsafe.reuseForks}</reuseForks>
-                    <threadCountClasses>${failsafe.forkCount}</threadCountClasses>
-                    <forkedProcessExitTimeoutInSeconds>60</forkedProcessExitTimeoutInSeconds>
-                    <forkedProcessTimeoutInSeconds>900</forkedProcessTimeoutInSeconds>
-                    <argLine>${surefire.jvm.args}</argLine>
-
-                    <testFailureIgnore>true</testFailureIgnore>
-                    <skip>${skip.integration.tests}</skip>
-                    <skipTests>${skip.integration.tests}</skipTests>
-                    <runOrder>alphabetical</runOrder>
-                    <trimStackTrace>false</trimStackTrace>
-                    <parallel>classes</parallel>
-                    <excludes>
-                        <exclude>**/Abstract*TestCase.java</exclude>
-                        <exclude>**/Abstract*Test.java</exclude>
-                    </excludes>
-                    <includes>
-                        <include>${failsafe.include.pattern}</include>
-                    </includes>
-                </configuration>
                 <executions>
                     <execution>
                         <goals>
@@ -552,9 +601,6 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <configuration>
-                    <formats>XML</formats>
-                </configuration>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
@@ -597,7 +643,6 @@
                 <artifactId>maven-enforcer-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>enforce-versions</id>
                         <goals>
                             <goal>enforce</goal>
                         </goals>
@@ -626,12 +671,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <buildNumberPropertyName>maven.build.number</buildNumberPropertyName>
-                    <getRevisionOnlyOnce>true</getRevisionOnlyOnce>
-                    <shortRevisionLength>8</shortRevisionLength>
-                </configuration>
-
             </plugin>
 
             <plugin>
@@ -707,6 +746,11 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jreleaser</groupId>
+                <artifactId>jreleaser-maven-plugin</artifactId>
             </plugin>
 
         </plugins>
