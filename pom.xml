@@ -93,20 +93,22 @@
         <maven-release.version>3.3.1</maven-release.version>
         <maven-deploy.version>3.1.4</maven-deploy.version>
         <maven-site.version>3.22.0</maven-site.version>
-        <maven-surefire.version>3.5.5</maven-surefire.version>
-        <maven-failsafe.version>3.5.5</maven-failsafe.version>
+        <maven-surefire.version>3.5.6</maven-surefire.version>
+        <maven-failsafe.version>3.5.6</maven-failsafe.version>
         <maven-enforcer.version>3.6.3</maven-enforcer.version>
         <maven-compiler.version>3.8.1</maven-compiler.version>
         <maven-jar.version>3.5.0</maven-jar.version>
         <maven-scm.version>2.2.1</maven-scm.version>
         <maven-project-info.version>3.9.0</maven-project-info.version>
 
-        <jacoco.version>0.8.14</jacoco.version>
-        <spotbugs.version>4.9.8.3</spotbugs.version>
+        <jacoco.version>0.8.15</jacoco.version>
+        <spotbugs.version>4.10.2.0</spotbugs.version>
         <codehaus.versions.version>2.21.0</codehaus.versions.version>
         <codehause.buildnumber.version>3.3.0</codehause.buildnumber.version>
+        <!-- Do not go above 0.8.X for now -->
         <sonatype.central-publishing>0.8.0</sonatype.central-publishing>
-        <talos.version>1.0.4</talos.version>
+        <jreleaser.version>1.24.0</jreleaser.version>
+        <talos.version>1.0.5</talos.version>
 
         <serenity.version>5.3.10</serenity.version>
         <serenity.tags/>
@@ -416,6 +418,13 @@
                     </configuration>
                 </plugin>
 
+                <plugin>
+                    <groupId>org.jreleaser</groupId>
+                    <artifactId>jdks-maven-plugin</artifactId>
+                    <version>${jreleaser.version}</version>
+                    <inherited>false</inherited>
+                </plugin>
+
             </plugins>
         </pluginManagement>
         <plugins>
@@ -598,7 +607,7 @@
                                     <version>[3.8, 4.0)</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
-                                    <version>[21, 23)</version>
+                                    <version>[21, 25]</version>
                                 </requireJavaVersion>
                             </rules>
                         </configuration>
