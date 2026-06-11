@@ -652,7 +652,7 @@
                                     <version>[3.8, 4.0)</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
-                                    <version>[21, 25]</version>
+                                    <version>[21, 26)</version>
                                 </requireJavaVersion>
                             </rules>
                         </configuration>
